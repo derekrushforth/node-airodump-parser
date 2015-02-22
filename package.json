@@ -1,0 +1,20 @@
+{
+  "name": "node-airodump-parser",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Parse airodump data through nodeJS",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://derekrushforth@github.com/derekrushforth/node-airodump-parser.git"
+  },
+  "author": "Derek Rushforth <derekrushforth@gmail.com> (http://derekrushforth.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/derekrushforth/node-airodump-parser/issues"
+  },
+  "homepage": "https://github.com/derekrushforth/node-airodump-parser"
+}
