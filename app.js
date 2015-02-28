@@ -1,11 +1,12 @@
 var http = require('http'),
     express = require('express'),
+    exec = require('exec'),
     _ = require('lodash'),
-    app = express(),
-    env = process.env.NODE_ENV || 'dev',
     fs = require('fs'),
     watch = require('watch'),
-    request = require('request');
+    request = require('request'),
+    app = express(),
+    env = process.env.NODE_ENV || 'dev';
 
 var endpoint = 'http://requestb.in/1i5ulv01';
 
@@ -24,7 +25,17 @@ var config = {
 var server = app.listen(config.port, function() {
     console.log('Starting up on port: ' + config.port);
 
-    startWatching();
+    exec(['airodump-ng', '-w dump wlan0'], function(err, out, code) {
+      if (err instanceof Error)
+        if (err.code === 'ENOENT') {
+          throw new Error('airodump command not found.');
+        }
+        process.stderr.write(err);
+        process.stdout.write(out);
+        process.exit(code);
+    });
+
+    //startWatching();
     // TODO: Exec airodump cmd
     // TODO: Start watching
 });

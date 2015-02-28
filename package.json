@@ -19,6 +19,7 @@
   "homepage": "https://github.com/derekrushforth/node-airodump-parser",
   "dependencies": {
     "JSON2": "^0.1.0",
+    "exec": "^0.2.0",
     "express": "^4.9.5",
     "lodash": "^2.4.1",
     "request": "^2.53.0",
