@@ -25,7 +25,7 @@ var config = {
 var server = app.listen(config.port, function() {
     console.log('Starting up on port: ' + config.port);
 
-    exec('airodump-ng -w dump wlan0', function(err, out, code) {
+    exec('cd ./data;airodump-ng -w dump wlan0', function(err, out, code) {
       if (err instanceof Error)
         if (err.code === 'ENOENT') {
           throw new Error('airodump command not found.');
