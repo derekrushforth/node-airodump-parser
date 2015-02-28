@@ -1,8 +1,20 @@
 # node-airodump-parser
-Parse airodump data through nodeJS
+Parse airodump data through nodeJS. This is a WIP.
 
 ## Usage
-WIP
 
-## TODO
-* Startup script which handles airodump-ng and node app process
+Install nodemon globally
+
+```
+npm install nodemon -g
+```
+
+Install npm modules
+```
+npm install
+```
+
+Start app
+```
+sh start.sh
+```
