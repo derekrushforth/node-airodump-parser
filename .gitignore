@@ -1,3 +1,6 @@
 node_modules
-data/*
+data/*.csv
+data/*.cap
+data/*.netxml
+data/*.json
 deploy.sh
