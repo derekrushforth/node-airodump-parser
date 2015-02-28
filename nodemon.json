@@ -1,4 +1,4 @@
 {
   "verbose": true,
-  "ignore": ["data/*"]
+  "ignore": ["data/*", ".git/*", ".DS_Store"]
 }

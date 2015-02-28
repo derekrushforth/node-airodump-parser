@@ -4,3 +4,4 @@ data/*.cap
 data/*.netxml
 data/*.json
 deploy.sh
+.DS_Store
