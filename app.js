@@ -5,16 +5,17 @@ var http = require('http'),
     fs = require('fs'),
     watch = require('watch'),
     request = require('request'),
-    app = express(),
-    env = process.env.NODE_ENV || 'dev';
+    isOnline = require('is-online'),
+    app = express();
 
-var endpoint = 'http://requestb.in/1i5ulv01';
 
 //-------------------------------------------
 // Config
 //-------------------------------------------
 var config = {
-  port: (env === 'dev') ? 3002 : 80
+  port: 3000,
+  endpoint: 'http://requestb.in/1i5ulv01',
+  env: process.env.NODE_ENV || 'dev'
 };
 
 
@@ -25,20 +26,28 @@ var config = {
 var server = app.listen(config.port, function() {
     console.log('Starting up on port: ' + config.port);
 
-    exec('cd ./data;airodump-ng -w dump wlan0', function(err, out, code) {
-      if (err instanceof Error)
-        if (err.code === 'ENOENT') {
-          throw new Error('airodump command not found.');
-        }
-        process.stderr.write(err);
-        process.stdout.write(out);
-        process.exit(code);
+    isOnline(function(err, online) {
+      console.log('is online: ' + online);
     });
-
-    //startWatching();
-    // TODO: Exec airodump cmd
-    // TODO: Start watching
+    
+    //init();
+    startWatching();
 });
+
+function init() {
+  exec('cd ./data;airodump-ng -w dump wlan0', function(err, out, code) {
+    if (err instanceof Error) {
+      if (err.code === 'ENOENT') {
+        throw new Error('airodump command not found.');
+      }
+
+      //startWatching();
+      process.stderr.write(err);
+      process.stdout.write(out);
+      process.exit(code);
+    }
+  });
+}
 
 function startWatching() {
   console.log('Watch');
@@ -64,7 +73,7 @@ function parse() {
       method: 'post',
       body: json,
       json: true,
-      url: endpoint
+      url: config.endpoint
     }
 
     request(options, function(err, response, body) {
