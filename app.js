@@ -53,7 +53,7 @@ function init() {
 
   //ls.stdout.pipe(process.stdout);
 
-  var cmd = spawn('airodump-ng', ['-w ' + config.dumpName + ' ' + config.interface], {cwd: './data'});
+  var cmd = spawn('airodump-ng', ['-w ' + config.dumpName, config.interface], {cwd: './data'});
 
   cmd.stdout.on('data', function (data) {
     console.log('stdout: ' + data);
