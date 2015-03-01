@@ -5,17 +5,26 @@ var http = require('http'),
     fs = require('fs'),
     watch = require('watch'),
     request = require('request'),
+    xml2json = require('xml-to-json'),
+    csv = require('csv-to-json'),
     isOnline = require('is-online'),
     app = express();
 
 
-//-------------------------------------------
-// Config
-//-------------------------------------------
 var config = {
   port: 3000,
   endpoint: 'http://requestb.in/1i5ulv01',
   env: process.env.NODE_ENV || 'dev'
+};
+
+var state = {
+  newData: false
+};
+
+var requestOptions = {
+  method: 'post',
+  json: true,
+  url: config.endpoint
 };
 
 
@@ -26,13 +35,15 @@ var config = {
 var server = app.listen(config.port, function() {
     console.log('Starting up on port: ' + config.port);
 
-    isOnline(function(err, online) {
-      console.log('is online: ' + online);
-    });
-    
-    //init();
-    startWatching();
+    if (config.env !== 'dev') {
+      // Only init if we're running it on the target environment
+      init();
+    } else {
+      // If we're running it in dev
+      startWatching();
+    }
 });
+
 
 function init() {
   exec('cd ./data;airodump-ng -w dump wlan0', function(err, out, code) {
@@ -41,7 +52,7 @@ function init() {
         throw new Error('airodump command not found.');
       }
 
-      //startWatching();
+      startWatching();
       process.stderr.write(err);
       process.stdout.write(out);
       process.exit(code);
@@ -49,39 +60,69 @@ function init() {
   });
 }
 
+
 function startWatching() {
-  console.log('Watch');
+  console.log('Watching for changes to airodump data');
 
   watch.createMonitor('./data', function (monitor) {
-    monitor.on("changed", function (f, curr, prev) {
-      console.log('changed');
-      console.log(curr);
-      // TODO: parse changed file
+    monitor.on("changed", function (file, curr, prev) {
+      console.log('File changed: ' + file);
+      parseData(file);
     });
   });
 }
 
-function parse() {
-  console.log('Parse');
 
-  fs.readFile('data/kismet.json', 'utf-8', function(err, data) {
-    if (err) throw err;
+function parseData(file) {
+  console.log('Parsing data');
 
-    var json = JSON.parse(data);
+  fs.readFile(file, 'utf-8', function(err, data) {
+    if (err) throw err
 
-    var options = {
-      method: 'post',
-      body: json,
-      json: true,
-      url: config.endpoint
-    }
+    // Check if we're online
+    isOnline(function(err, online) {
+      if (err) throw err;
 
-    request(options, function(err, response, body) {
-      if (err) throw err
-      console.log(body);
+      if (online === true) {
+        // Device is online
+        console.log('Device is online');
+        var json = JSON.parse(data);
+        postData(json);
+      } else {
+        // Device is offline
+        console.log('Device is offline. Waiting for device to come online to post data.');
+        // TODO: if there's new data, post it when we come online
+        state.newData = true;
+        checkConnection();
+      }
     });
 
   });
+}
+
+
+function postData(json) {
+  console.log('Posting data to: ' + config.endpoint);
+
+  requestOptions.body = json;
+
+  request(requestOptions, function(err, response, body) {
+    if (err) throw err
+    console.log(body);
+  });
+}
+
+
+function checkConnection() {
+  console.log('Checking for new data');
+  // Check for new data every minute
+
+  setInterval(function(){
+    // TODO: check if online.
+    //       check if new data is available.
+    //       post the data if the conditions are met.
+    //       reset data state
+  }, 60000);
 }
 
 
