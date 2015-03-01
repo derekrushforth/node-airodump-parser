@@ -59,7 +59,7 @@ function init() {
   //   config.interface
   // ], {cwd: './data'});
 
-  var cmd = spawn('airodump-ng -w ' + config.dumpName + ' --output-format netxml ' + config.interface + '--output-format netxml',[], {cwd: './data'});
+  var cmd = spawn('airodump-ng -w ' + config.dumpName + ' --output-format netxml ' + config.interface,[], {cwd: './data'});
 
   //var cmd = spawn('top',['-l 0']);
   //console.log(cmd.connected);
