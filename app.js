@@ -14,7 +14,8 @@ var http = require('http'),
 var config = {
   port: 3000,
   endpoint: 'http://requestb.in/1i5ulv01',
-  env: process.env.NODE_ENV || 'dev'
+  env: process.env.NODE_ENV || 'dev',
+  interface: 'wlan0'
 };
 
 var state = {
@@ -46,7 +47,7 @@ var server = app.listen(config.port, function() {
 
 
 function init() {
-  exec('cd ./data;airodump-ng -w dump wlan0', function(err, out, code) {
+  exec('cd ./data;airodump-ng -w dump ' + config.interface, function(err, out, code) {
     if (err instanceof Error) {
       if (err.code === 'ENOENT') {
         throw new Error('airodump command not found.');
