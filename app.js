@@ -55,6 +55,9 @@ function init() {
 
   var cmd = spawn('airodump-ng', ['-w ' + config.dumpName, config.interface], {cwd: './data'});
 
+  //var cmd = spawn('top',['-l 0']);
+  //console.log(cmd.connected);
+
   cmd.stdout.on('data', function (data) {
     //console.log('stdout: ' + data);
   });
@@ -67,13 +70,14 @@ function init() {
     console.log('child process exited with code ' + code);
   });
 
-  startWatching();
+  setTimeout(function() {startWatching();}, 10000);
 }
 
 
 function startWatching() {
   console.log('Watching for changes to airodump data');
 
+  // TODO: need to fire this on success of cmd command
   watch.createMonitor('./data', function (monitor) {
     monitor.on("changed", function (file, curr, prev) {
       console.log('File changed: ' + file);
