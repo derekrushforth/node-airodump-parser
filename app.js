@@ -9,12 +9,13 @@ var http = require('http'),
     exec = require('child_process').exec,
     spawn = require('child_process').spawn,
     isOnline = require('is-online'),
+    path = require('path'),
     app = express();
 
 
 var config = {
   port: 3000,
-  endpoint: 'http://requestb.in/1jcix2y1',
+  endpoint: 'http://requestb.in/xf1ptvxf',
   env: process.env.NODE_ENV || '',
   interface: 'wlan0',
   dumpName: 'dump'
@@ -53,13 +54,10 @@ function init() {
 
   //ls.stdout.pipe(process.stdout);
 
-  // var cmd = spawn('airodump-ng', [
-  //   '-w ' + config.dumpName, 
-  //   '--output-format netxml', 
-  //   config.interface
-  // ], {cwd: './data'});
-
-  var cmd = spawn('airodump-ng -w ' + config.dumpName + ' --output-format netxml ' + config.interface,[], {cwd: './data'});
+  var cmd = spawn('airodump-ng', [
+    '-w ' + config.dumpName, 
+    config.interface
+  ], {cwd: './data'});
 
   //var cmd = spawn('top',['-l 0']);
   //console.log(cmd.connected);
@@ -88,7 +86,11 @@ function startWatching() {
   watch.createMonitor('./data', function (monitor) {
     monitor.on("changed", function (file, curr, prev) {
       console.log('File changed: ' + file);
-      parseData(file);
+
+      if (path.extname(file) === '.netxml') {
+        parseData(file);
+      }
+      
     });
   });
 }
@@ -113,8 +115,6 @@ function parseData(file) {
         if (online === true) {
           // Device is online
           console.log('Device is online');
-          console.log(result);
-          //var json = JSON.parse(result);
           postData(result);
         } else {
           // Device is offline
