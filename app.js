@@ -56,11 +56,11 @@ function init() {
   var cmd = spawn('airodump-ng', ['-w ' + config.dumpName, config.interface], {cwd: './data'});
 
   cmd.stdout.on('data', function (data) {
-    console.log('stdout: ' + data);
+    //console.log('stdout: ' + data);
   });
 
   cmd.stderr.on('data', function (data) {
-    console.log('stderr: ' + data);
+    //console.log('stderr: ' + data);
   });
 
   cmd.on('close', function (code) {
@@ -86,28 +86,29 @@ function startWatching() {
 function parseData(file) {
   console.log('Parsing data');
 
-  fs.readFile(file, 'utf-8', function(err, data) {
-    if (err) throw err
+  console.log(file);
+  // fs.readFile(file, 'utf-8', function(err, data) {
+  //   if (err) throw err
 
-    // Check if we're online
-    isOnline(function(err, online) {
-      if (err) throw err;
+  //   // Check if we're online
+  //   isOnline(function(err, online) {
+  //     if (err) throw err;
 
-      if (online === true) {
-        // Device is online
-        console.log('Device is online');
-        var json = JSON.parse(data);
-        postData(json);
-      } else {
-        // Device is offline
-        console.log('Device is offline. Waiting for device to come online to post data.');
-        // TODO: if there's new data, post it when we come online
-        state.newData = true;
-        checkConnection();
-      }
-    });
+  //     if (online === true) {
+  //       // Device is online
+  //       console.log('Device is online');
+  //       var json = JSON.parse(data);
+  //       postData(json);
+  //     } else {
+  //       // Device is offline
+  //       console.log('Device is offline. Waiting for device to come online to post data.');
+  //       // TODO: if there's new data, post it when we come online
+  //       state.newData = true;
+  //       checkConnection();
+  //     }
+  //   });
 
-  });
+  // });
 }
 
 
