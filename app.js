@@ -15,7 +15,7 @@ var http = require('http'),
 
 var config = {
   port: 3000,
-  endpoint: 'http://requestb.in/xf1ptvxf',
+  endpoint: 'http://reality-versioning-api.herokuapp.com/data',
   env: process.env.NODE_ENV || '',
   interface: 'wlan0',
   dumpName: 'dump'
