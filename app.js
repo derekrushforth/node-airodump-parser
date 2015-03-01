@@ -14,7 +14,7 @@ var http = require('http'),
 
 var config = {
   port: 3000,
-  endpoint: 'http://requestb.in/1i5ulv01',
+  endpoint: 'http://requestb.in/1jcix2y1',
   env: process.env.NODE_ENV || '',
   interface: 'wlan0',
   dumpName: 'dump'
@@ -53,7 +53,11 @@ function init() {
 
   //ls.stdout.pipe(process.stdout);
 
-  var cmd = spawn('airodump-ng', ['-w ' + config.dumpName, config.interface], {cwd: './data'});
+  var cmd = spawn('airodump-ng', [
+    '-w ' + config.dumpName, 
+    '--output-format netxml', 
+    config.interface
+  ], {cwd: './data'});
 
   //var cmd = spawn('top',['-l 0']);
   //console.log(cmd.connected);
@@ -70,6 +74,7 @@ function init() {
     console.log('child process exited with code ' + code);
   });
 
+  // TODO: Start this when cmd is connected instead of on a timeout
   setTimeout(function() {startWatching();}, 10000);
 }
 
@@ -90,29 +95,37 @@ function startWatching() {
 function parseData(file) {
   console.log('Parsing data');
 
-  console.log(file);
-  // fs.readFile(file, 'utf-8', function(err, data) {
-  //   if (err) throw err
+  xml2json({
+    input: file
+  }, function(err, result) {
+    
+    if (err) {
+      console.error(err);
+    } else {
+      // TODO: clean this up
 
-  //   // Check if we're online
-  //   isOnline(function(err, online) {
-  //     if (err) throw err;
+      // Check if we're online
+      isOnline(function(err, online) {
+        if (err) throw err;
 
-  //     if (online === true) {
-  //       // Device is online
-  //       console.log('Device is online');
-  //       var json = JSON.parse(data);
-  //       postData(json);
-  //     } else {
-  //       // Device is offline
-  //       console.log('Device is offline. Waiting for device to come online to post data.');
-  //       // TODO: if there's new data, post it when we come online
-  //       state.newData = true;
-  //       checkConnection();
-  //     }
-  //   });
+        if (online === true) {
+          // Device is online
+          console.log('Device is online');
+          console.log(result);
+          //var json = JSON.parse(result);
+          postData(result);
+        } else {
+          // Device is offline
+          console.log('Device is offline. Waiting for device to come online to post data.');
+          // TODO: if there's new data, post it when we come online
+          state.newData = true;
+          checkConnection();
+        }
+      });
 
-  // });
+
+    }
+  });
 }
 
 
@@ -123,7 +136,7 @@ function postData(json) {
 
   request(requestOptions, function(err, response, body) {
     if (err) throw err
-    console.log(body);
+    console.log('Response: ' + body);
   });
 }
 
