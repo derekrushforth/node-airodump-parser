@@ -1,13 +1,12 @@
-# node-airodump-parser
-Parse airodump data through nodeJS. This is a WIP.
+# Node Airodump Parser
+Take data gathered through airdump and POST it to an endpoint. This is a WIP.
+
+## Requirements
+
+* NodeJS 0.10+
+* Airodump 1.1+
 
 ## Usage
-
-Install nodemon globally
-
-```
-npm install nodemon -g
-```
 
 Install npm modules
 ```
