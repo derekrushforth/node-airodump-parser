@@ -1,5 +1,5 @@
 # Node Airodump Parser
-Take data gathered through airdump and POST it to an endpoint. This is a WIP.
+Take data gathered through airodump and POST it to an endpoint. This is a WIP.
 
 ## Requirements
 
