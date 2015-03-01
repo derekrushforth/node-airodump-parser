@@ -1,12 +1,13 @@
 var http = require('http'),
     express = require('express'),
-    exec = require('exec'),
     _ = require('lodash'),
     fs = require('fs'),
     watch = require('watch'),
     request = require('request'),
     xml2json = require('xml-to-json'),
     csv = require('csv-to-json'),
+    exec = require('child_process').exec,
+    spawn = require('child_process').spawn,
     isOnline = require('is-online'),
     app = express();
 
@@ -15,7 +16,8 @@ var config = {
   port: 3000,
   endpoint: 'http://requestb.in/1i5ulv01',
   env: process.env.NODE_ENV || '',
-  interface: 'wlan0'
+  interface: 'wlan0',
+  dumpName: 'dump'
 };
 
 var state = {
@@ -47,22 +49,25 @@ var server = app.listen(config.port, function() {
 
 
 function init() {
-  console.log('Executing airodump-ng');
+  console.log('Attempt to execute airodump-ng');
 
-  exec('cd ./data;airodump-ng -w dump ' + config.interface, function(err, out, code) {
-    if (err instanceof Error) {
-      if (err.code === 'ENOENT') {
-        throw new Error('airodump command not found.');
-      }
+  //ls.stdout.pipe(process.stdout);
 
-      console.log('airodump-ng is running. Data is dumping to the local data folder.')
+  var cmd = spawn('airodump-ng', ['-w ' + config.dumpName + ' ' + config.interface], {cwd: './data'});
 
-      startWatching();
-      process.stderr.write(err);
-      process.stdout.write(out);
-      process.exit(code);
-    }
+  cmd.stdout.on('data', function (data) {
+    console.log('stdout: ' + data);
   });
+
+  cmd.stderr.on('data', function (data) {
+    console.log('stderr: ' + data);
+  });
+
+  cmd.on('close', function (code) {
+    console.log('child process exited with code ' + code);
+  });
+
+  startWatching();
 }
 
 
