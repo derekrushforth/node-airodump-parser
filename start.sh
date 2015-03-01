@@ -1,2 +1,2 @@
 #!/bin/bash
-nodemon app.js
+node app.js
