@@ -4,8 +4,7 @@ var http = require('http'),
     fs = require('fs'),
     watch = require('watch'),
     request = require('request'),
-    xml2json = require('xml-to-json'),
-    csv = require('csv-to-json'),
+    parser = require('xml2json'),
     exec = require('child_process').exec,
     spawn = require('child_process').spawn,
     isOnline = require('is-online'),
@@ -14,8 +13,8 @@ var http = require('http'),
 
 
 var config = {
-  port: 3000,
-  endpoint: 'http://reality-versioning-api.herokuapp.com/data',
+  port: 3030,
+  endpoint: process.env.NODE_ENV === 'dev' ? 'http://localhost:3005/data':'http://reality-versioning-api.herokuapp.com/data',
   env: process.env.NODE_ENV || '',
   interface: 'wlan0',
   dumpName: 'dump'
@@ -82,11 +81,11 @@ function init() {
 function startWatching() {
   console.log('Watching for changes to airodump data');
 
-  // TODO: need to fire this on success of cmd command
   watch.createMonitor('./data', function (monitor) {
     monitor.on("changed", function (file, curr, prev) {
       console.log('File changed: ' + file);
 
+      // Filter out netxml files
       if (path.extname(file) === '.netxml') {
         parseData(file);
       }
@@ -99,33 +98,22 @@ function startWatching() {
 function parseData(file) {
   console.log('Parsing data');
 
-  xml2json({
-    input: file
-  }, function(err, result) {
-    
-    if (err) {
-      console.error(err);
+  var xml = fs.readFileSync(file),
+      data = parser.toJson(xml);
+
+  isOnline(function(err, online) {
+    if (err) throw err;
+
+    if (online === true) {
+      // Device is online
+      console.log('Device is online');
+      postData(data);
     } else {
-      // TODO: clean this up
-
-      // Check if we're online
-      isOnline(function(err, online) {
-        if (err) throw err;
-
-        if (online === true) {
-          // Device is online
-          console.log('Device is online');
-          postData(result);
-        } else {
-          // Device is offline
-          console.log('Device is offline. Waiting for device to come online to post data.');
-          // TODO: if there's new data, post it when we come online
-          state.newData = true;
-          checkConnection();
-        }
-      });
-
-
+      // Device is offline
+      console.log('Device is offline. Waiting for device to come online to post data.');
+      // TODO: if there's new data, post it when we come online
+      state.newData = true;
+      checkConnection();
     }
   });
 }
@@ -134,10 +122,13 @@ function parseData(file) {
 function postData(json) {
   console.log('Posting data to: ' + config.endpoint);
 
-  requestOptions.body = json;
+  data = JSON.parse(json);
+
+  requestOptions.body = data['detection-run']['wireless-network'];
 
   request(requestOptions, function(err, response, body) {
     if (err) throw err
+      console.log(body);
     console.log('Response: ' + body);
   });
 }
