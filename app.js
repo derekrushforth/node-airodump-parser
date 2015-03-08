@@ -122,9 +122,7 @@ function parseData(file) {
 function postData(json) {
   console.log('Posting data to: ' + config.endpoint);
 
-  data = JSON.parse(json);
-
-  requestOptions.body = data['detection-run']['wireless-network'];
+  requestOptions.body = JSON.parse(json);
 
   request(requestOptions, function(err, response, body) {
     if (err) throw err
