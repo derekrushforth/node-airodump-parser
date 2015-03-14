@@ -17,7 +17,7 @@ var config = {
   port: 3030,
   interface: 'wlan0',
   dumpName: 'dump',
-  endpoint: process.env.NODE_ENV === 'dev' ? 'http://localhost:3005/data':'http://reality-versioning-api.herokuapp.com/data',
+  endpoint: process.env.NODE_ENV === 'dev' ? 'http://192.168.1.15:3005/data':'http://reality-versioning-api.herokuapp.com/data',
   env: process.env.NODE_ENV || ''
 };
 
